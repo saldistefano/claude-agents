@@ -12,6 +12,7 @@ Each agent is a persona with a defined role, decision authority, and context loa
 | `/architect` | Principal Engineer & Architect | **Blocking authority** over all technical decisions |
 | `/deployer` | CI/CD & Infrastructure | Owns path from code to production |
 | `/marketing` | Marketing & Social Media Manager | Owns positioning, community, and public properties |
+| `/reviewer` | Expert Code Reviewer | **Blocking authority** before any commit — security, async safety, privacy, architecture drift |
 
 ## Decision Authority Chain
 
@@ -19,9 +20,10 @@ Each agent is a persona with a defined role, decision authority, and context loa
 CEO (user)
   ├── COO          → task sequencing, process, project board
   ├── Muse         → advisory only, no veto
-  └── Architect    → technical decisions (blocking authority)
-        └── Deployer → infrastructure within approved architecture
-        └── Marketing → positioning within approved direction (via COO)
+  ├── Architect    → technical decisions (blocking authority)
+  │     └── Deployer → infrastructure within approved architecture
+  │     └── Marketing → positioning within approved direction (via COO)
+  └── Reviewer     → code quality gate (blocking authority before commits/PRs)
 ```
 
 ## Installation
@@ -48,11 +50,13 @@ Copy the `agents/` directory into your dotfiles structure and symlink as appropr
 Once installed, invoke any agent with its slash command in Claude Code:
 
 ```
-/coo          → get current project status, blockers, next actions
-/muse         → challenge current direction, generate ideas
-/architect    → validate a technical decision before implementing
-/deployer     → plan a deployment, pipeline, or infrastructure change
-/marketing    → draft a post, plan a launch, review positioning
+/coo                      → get current project status, blockers, next actions
+/muse                     → challenge current direction, generate ideas
+/architect                → validate a technical decision before implementing
+/deployer                 → plan a deployment, pipeline, or infrastructure change
+/marketing                → draft a post, plan a launch, review positioning
+/reviewer                 → review staged code before committing (standard mode)
+/reviewer --ride-along    → walk through code together; teaches Rust patterns as it reviews
 ```
 
 ## Project Context
@@ -69,6 +73,20 @@ structure, edit the "Context I Load on Startup" section of each agent file.
 - **Architect has blocking authority** — nothing gets built until it's technically approved.
 - **Blog diary at end of every session** — `marketing` and `coo` both remind you to write it.
 - **Agents are project-agnostic** — edit the context-loading section for your project structure.
+
+## References
+
+The `/reviewer` agent checklist is backed by primary research. See [`references/reviewer-references.md`](references/reviewer-references.md) for the full annotated source list covering:
+
+- Official Rust Style Guide and API Guidelines
+- Google eng-practices code review standard
+- Conventional Comments specification
+- Rust async pitfalls (Alice Ryhl, Qovery, Google Comprehensive Rust)
+- OWASP SSRF and security review guides
+- Error handling patterns (Luca Palmieri)
+- Privacy and observability (secrecy crate, tracing)
+
+Add new references there as the checklist evolves.
 
 ## Contributing
 
